@@ -1,17 +1,14 @@
 {
-  "id": "/",
+  "id": "/MinDance-/",
   "name": "MinDance",
   "short_name": "MinDance",
   "description": "Ứng dụng quản lý lớp học và học viên MinDance",
   "lang": "vi",
   "dir": "ltr",
   "display": "standalone",
-  "start_url": "/",
-  "scope": "/",
+  "start_url": "/MinDance-/",
+  "scope": "/MinDance-/",
   "background_color": "#f7f6fb",
   "theme_color": "#7c3aed",
   "orientation": "portrait-primary"
 }
-"id": "/MinDance-/",
-"start_url": "/MinDance-/",
-"scope": "/MinDance-/"
