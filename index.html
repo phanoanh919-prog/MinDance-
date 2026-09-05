@@ -244,7 +244,7 @@ async function submitAbsence(studentId){const {data,error}=await supa.rpc('submi
 async function openMore(){if(!active())return;$('content').innerHTML=`<div class="card"><h2>Chức năng khác</h2><div class="stack" style="margin-top:10px"><button class="btn" onclick="openPackages()">📦 Gói học</button><button class="btn" onclick="openFinance()">💳 Học phí</button><button class="btn" onclick="openReports()">📊 Báo cáo</button><button class="btn" onclick="openAccounts()">👤 Tài khoản</button><button class="btn" onclick="openSettings()">⚙️ Cài đặt</button></div></div>`}
 
 supa.auth.onAuthStateChange(async(_e,s)=>{if(s?.user)await boot()});
-window.addEventListener('load',async()=>{const {data:{session}}=await supa.auth.getSession();if(session?.user)await boot();if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('SW register',e));}});
+window.addEventListener('load',async()=>{const {data:{session}}=await supa.auth.getSession();if(session?.user)await boot();/* Service Worker disabled on GitHub Pages until sw.js is deployed. */});
 
 
 // ===== V8 RELEASE CANDIDATE HARDENING =====
@@ -7952,19 +7952,38 @@ window.openHome=async function(){
   }
 };
 
-// V2.1: Parent role is retired. Keep guardian/contact data, but never expose a Parent login role.
+// V2.4 frontend cleanup: Parent login role is retired.
+// Guardian/contact fields remain as student profile data, but no Parent account actions are exposed.
 function mdV21RemoveLegacyParentUi(){
   document.querySelectorAll('option[value=\"parent\"]').forEach(el=>el.remove());
+
+  // Remove any legacy Parent-account action that an older render layer may inject.
+  document.querySelectorAll('[onclick*=\"showLinkParent\"],[onclick*=\"linkParent\"],[onclick*=\"unlinkParent\"]').forEach(el=>el.remove());
+
+  // Remove the obsolete Parent-account linking card. Guardian name/phone remain in the student profile header.
+  document.querySelectorAll('#content .card').forEach(card=>{
+    const txt=(card.textContent||'').trim();
+    if(txt.includes('Phụ huynh liên kết') || txt.includes('tài khoản phụ huynh')) card.remove();
+  });
+
+  // Remove legacy wording from old render layers if one flashes before the final role UI is applied.
   document.querySelectorAll('.center .muted').forEach(el=>{
     if((el.textContent||'').includes('Phụ huynh')) el.textContent=(el.textContent||'').replace(/\s*·\s*Phụ huynh/g,'');
   });
 }
+
+// Hard-disable retired Parent account actions. Backend RPCs are already revoked as defense in depth.
+window.autoLinkParentByPhone=async function(){};
+window.showLinkParent=async function(){};
+window.linkParent=async function(){};
+window.unlinkParent=async function(){};
+
 window.addEventListener('load',mdV21RemoveLegacyParentUi);
 new MutationObserver(mdV21RemoveLegacyParentUi).observe(document.documentElement,{childList:true,subtree:true});
 
 document.title='MinDance';
-window.MINDANCE_RELEASE='V2_3_NETLIFY_READY';
-window.MINDANCE_BUILD='2026-09-05';
+window.MINDANCE_RELEASE='V2_4_GITHUB_PAGES_CLEAN';
+window.MINDANCE_BUILD='2026-09-06';
 </script>
 
 </body>
